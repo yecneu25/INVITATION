@@ -519,7 +519,7 @@ downloadBtn.addEventListener('click', async () => {
         padding: 2.5rem 2rem 2rem !important; text-align: center !important;
       }
       #__yec-export-wrap .card-header-logo {
-        width: 180px !important; height: 180px !important;
+        width: 180px !important; height: auto !important;
       }
       #__yec-export-wrap .card-event-name { font-size: 2rem !important; }
       #__yec-export-wrap .card-event-year {
