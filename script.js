@@ -462,19 +462,31 @@ downloadBtn.addEventListener('click', async () => {
     // Temporarily hide action buttons from screenshot
     actionButtons.style.visibility = 'hidden';
 
-    // 1. Capture the invitation card at 2× resolution
+    // 1. Strip shadow/radius so html2canvas captures ZERO transparent fringe
+    const prevShadow = invitationCard.style.boxShadow;
+    const prevRadius = invitationCard.style.borderRadius;
+    const prevBorder = invitationCard.style.border;
+    invitationCard.style.boxShadow = 'none';
+    invitationCard.style.borderRadius = '0';
+    invitationCard.style.border = 'none';
+
+    // 2. Capture at 2× resolution with solid background
     const cardCanvas = await html2canvas(invitationCard, {
       scale: 2,
       useCORS: true,
       allowTaint: true,
-      backgroundColor: null,
+      backgroundColor: '#FDFAF4',   // card's own background color
       logging: false,
       removeContainer: true,
     });
 
+    // Restore card styles
+    invitationCard.style.boxShadow = prevShadow;
+    invitationCard.style.borderRadius = prevRadius;
+    invitationCard.style.border = prevBorder;
     actionButtons.style.visibility = '';
 
-    // 2. Create a 9:16 output canvas (1080×1920 — Facebook/Instagram Story standard)
+    // 3. Create a 9:16 output canvas (1080×1920 — Facebook/Instagram Story standard)
     const OUT_W = 1080;
     const OUT_H = 1920;
     const storyCanvas = document.createElement('canvas');
@@ -482,24 +494,20 @@ downloadBtn.addEventListener('click', async () => {
     storyCanvas.height = OUT_H;
     const sCtx = storyCanvas.getContext('2d');
 
-    // 3. Paint a warm cream background (matches the invitation palette)
-    const bgGrad = sCtx.createLinearGradient(0, 0, 0, OUT_H);
-    bgGrad.addColorStop(0,   '#FAF7EF');
-    bgGrad.addColorStop(0.5, '#F5EFE0');
-    bgGrad.addColorStop(1,   '#FAF7EF');
-    sCtx.fillStyle = bgGrad;
+    // 4. Fill background (covers any leftover top/bottom strip)
+    sCtx.fillStyle = '#FDFAF4';
     sCtx.fillRect(0, 0, OUT_W, OUT_H);
 
-    // 4. Scale card to fill full width (edge-to-edge, no white border)
-    const scale = OUT_W / cardCanvas.width;  // always fill full width
+    // 5. Scale card to fill full width edge-to-edge
+    const scale = OUT_W / cardCanvas.width;
     const drawW = OUT_W;
     const drawH = cardCanvas.height * scale;
     const drawX = 0;
-    const drawY = (OUT_H - drawH) / 2;      // center vertically
+    const drawY = (OUT_H - drawH) / 2;   // center vertically
 
     sCtx.drawImage(cardCanvas, drawX, drawY, drawW, drawH);
 
-    // 5. Export
+    // 6. Export
     const dataURL = storyCanvas.toDataURL('image/png', 1.0);
 
     const a  = document.createElement('a');
