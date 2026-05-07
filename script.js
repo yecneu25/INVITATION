@@ -516,32 +516,35 @@ downloadBtn.addEventListener('click', async () => {
         transform: none !important; opacity: 1 !important;
       }
       #__yec-export-wrap .card-header {
-        padding: 2.5rem 2rem 2rem !important; text-align: center !important;
+        padding: 2rem 1.5rem 1.5rem !important; text-align: center !important;
       }
       #__yec-export-wrap .card-header-logo {
-        width: 180px !important; height: auto !important;
+        width: 180px !important; height: auto !important; object-fit: contain !important;
+        flex-shrink: 0 !important; margin: 0 auto !important;
       }
-      #__yec-export-wrap .card-event-name { font-size: 2rem !important; }
+      #__yec-export-wrap .card-event-name { font-size: 2rem !important; margin-bottom: 0.2rem !important; }
       #__yec-export-wrap .card-event-year {
-        font-size: 0.6rem !important; letter-spacing: 0.12em !important;
+        font-size: 0.6rem !important; letter-spacing: 0.12em !important; margin-bottom: 0.5rem !important;
       }
       #__yec-export-wrap .tapestry-label { font-size: 1.1rem !important; }
-      #__yec-export-wrap .card-body { padding: 2.5rem 2.5rem !important; }
-      #__yec-export-wrap .greeting-line { font-size: 0.75rem !important; }
-      #__yec-export-wrap .invitee-name { font-size: 1.9rem !important; }
-      #__yec-export-wrap .recipient-info { margin-bottom: 1.8rem !important; }
+      #__yec-export-wrap .card-body { padding: 1.8rem 2.5rem !important; }
+      #__yec-export-wrap .greeting-line { font-size: 0.75rem !important; margin-bottom: 0.3rem !important; }
+      #__yec-export-wrap .invitee-name { font-size: 1.9rem !important; margin-bottom: 0.3rem !important; }
+      #__yec-export-wrap .recipient-info { margin-bottom: 1.5rem !important; }
       #__yec-export-wrap .invitation-text {
-        font-size: 1.05rem !important; line-height: 2 !important;
-        margin-bottom: 1.2rem !important;
+        font-size: 1.05rem !important; line-height: 1.8 !important;
+        margin-bottom: 1rem !important; text-align: justify !important;
       }
-      #__yec-export-wrap .event-details-box { padding: 1.2rem !important; }
-      #__yec-export-wrap .event-detail-label { font-size: 0.6rem !important; }
+      #__yec-export-wrap .event-details-box { padding: 1rem !important; margin-bottom: 1.5rem !important; }
+      #__yec-export-wrap .event-detail-item { margin-bottom: 0.8rem !important; }
+      #__yec-export-wrap .event-detail-label { font-size: 0.6rem !important; margin-bottom: 0.2rem !important; }
       #__yec-export-wrap .event-detail-value { font-size: 0.95rem !important; }
+      #__yec-export-wrap .closing-quote { margin-top: 1.5rem !important; font-size: 1rem !important; }
       #__yec-export-wrap .player-container,
       #__yec-export-wrap #vintage-player { display: none !important; }
-      #__yec-export-wrap .logo-wrapper { margin: 0.6rem auto !important; }
-      #__yec-export-wrap .card-rule { margin: 0.8rem 0 !important; }
-      #__yec-export-wrap .body-divider { margin: 0.8rem 0 !important; }
+      #__yec-export-wrap .logo-wrapper { margin: 0.4rem auto !important; }
+      #__yec-export-wrap .card-rule { margin: 0.6rem 0 !important; }
+      #__yec-export-wrap .body-divider { margin: 0.6rem 0 !important; }
     `;
     document.head.appendChild(styleTag);
 
