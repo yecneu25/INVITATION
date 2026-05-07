@@ -631,8 +631,8 @@ body {
 
 .event-detail-item {
   display: grid;
-  grid-template-columns: 1.6rem 1fr;
-  gap: 0.4rem 0.7rem;
+  grid-template-columns: 2rem 1fr;
+  gap: 0.5rem 0.9rem;
   align-items: center;
   margin-bottom: 0.9rem;
   padding-bottom: 0.9rem;
@@ -645,9 +645,23 @@ body {
 }
 
 .event-detail-icon {
-  font-size: 0.95rem;
+  width: 2rem;
+  height: 2rem;
   flex-shrink: 0;
-  opacity: 0.7;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(201, 168, 108, 0.12);
+  border: 1px solid rgba(201, 168, 108, 0.4);
+  border-radius: 4px;
+  color: var(--gold-dark);
+  align-self: center;
+}
+.event-detail-icon svg {
+  width: 1.1rem;
+  height: 1.1rem;
+  stroke: var(--gold-dark);
+  flex-shrink: 0;
 }
 
 .event-detail-content {
