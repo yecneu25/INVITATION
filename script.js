@@ -453,20 +453,18 @@ downloadBtn.addEventListener('click', async () => {
     return;
   }
 
-  // Show loading state
   const originalHTML = downloadBtn.innerHTML;
   downloadBtn.innerHTML = '<span class="loading-spinner"></span> Đang xuất ảnh...';
   downloadBtn.disabled  = true;
 
   try {
-    // Temporarily hide action buttons from screenshot
     actionButtons.style.visibility = 'hidden';
 
     const isMobile = window.innerWidth <= 768;
 
     if (!isMobile) {
       // ==========================================
-      // DESKTOP EXPORT LOGIC (KEPT EXACTLY AS-IS)
+      // DESKTOP EXPORT — untouched
       // ==========================================
       const prevShadow = invitationCard.style.boxShadow;
       const prevRadius = invitationCard.style.borderRadius;
@@ -476,12 +474,8 @@ downloadBtn.addEventListener('click', async () => {
       invitationCard.style.border = 'none';
 
       const cardCanvas = await html2canvas(invitationCard, {
-        scale: 2,
-        useCORS: true,
-        allowTaint: true,
-        backgroundColor: '#FDFAF4',
-        logging: false,
-        removeContainer: true,
+        scale: 2, useCORS: true, allowTaint: true,
+        backgroundColor: '#FDFAF4', logging: false, removeContainer: true,
       });
 
       invitationCard.style.boxShadow = prevShadow;
@@ -489,111 +483,133 @@ downloadBtn.addEventListener('click', async () => {
       invitationCard.style.border = prevBorder;
       actionButtons.style.visibility = '';
 
-      const OUT_W = 1080;
-      const OUT_H = 1920;
+      const OUT_W = 1080, OUT_H = 1920;
       const storyCanvas = document.createElement('canvas');
-      storyCanvas.width  = OUT_W;
-      storyCanvas.height = OUT_H;
+      storyCanvas.width = OUT_W; storyCanvas.height = OUT_H;
       const sCtx = storyCanvas.getContext('2d');
-
       sCtx.fillStyle = '#FDFAF4';
       sCtx.fillRect(0, 0, OUT_W, OUT_H);
-
       const scale = OUT_W / cardCanvas.width;
-      const drawW = OUT_W;
-      const drawH = cardCanvas.height * scale;
-      const drawX = 0;
-      const drawY = (OUT_H - drawH) / 2;
+      sCtx.drawImage(cardCanvas, 0, (OUT_H - cardCanvas.height * scale) / 2, OUT_W, cardCanvas.height * scale);
 
-      sCtx.drawImage(cardCanvas, drawX, drawY, drawW, drawH);
-
-      const dataURL = storyCanvas.toDataURL('image/png', 1.0);
-
-      const a  = document.createElement('a');
-      const safeName = displayName.textContent.replace(/\s+/g, '_');
-      a.href     = dataURL;
-      a.download = `Thiep_Moi_YEC25_${safeName}.png`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-
+      const a = document.createElement('a');
+      a.href = storyCanvas.toDataURL('image/png', 1.0);
+      a.download = `Thiep_Moi_YEC25_${displayName.textContent.replace(/\s+/g, '_')}.png`;
+      document.body.appendChild(a); a.click(); document.body.removeChild(a);
       showToast('🎉 Thiệp Story (9:16) đã được tải về!');
       return;
     }
 
     // ==========================================
-    // NEW MOBILE EXPORT LOGIC (1080x1920 CONTAINER)
+    // MOBILE EXPORT — dedicated 1080x1920 engine
     // ==========================================
-    
-    // 1. Create a dedicated fixed 1080x1920 container
-    const exportContainer = document.createElement('div');
-    exportContainer.style.position = 'fixed';
-    exportContainer.style.left = '-9999px';
-    exportContainer.style.top = '-9999px';
-    exportContainer.style.width = '1080px';
-    exportContainer.style.height = '1920px';
-    exportContainer.style.backgroundColor = '#FDFAF4';
-    exportContainer.style.overflow = 'hidden';
-    exportContainer.style.display = 'flex';
-    exportContainer.style.alignItems = 'center';
-    exportContainer.style.justifyContent = 'center';
-    exportContainer.style.zIndex = '-9999';
 
-    // 2. Clone the invitation card and optimize for print/story
-    const clonedCard = invitationCard.cloneNode(true);
-    
-    // Force desktop styling rules on the clone by enforcing fixed width
-    // Slightly scale down from 1080 to maintain safe margins (e.g. 960px width)
-    clonedCard.style.width = '960px'; 
-    clonedCard.style.maxWidth = '960px';
-    clonedCard.style.margin = '0 auto';
-    clonedCard.style.transform = 'none'; // Remove slide-up animation
-    clonedCard.style.boxShadow = 'none'; // Prevent fringe artifacts
-    clonedCard.style.border = 'none';
-    clonedCard.style.borderRadius = '0';
-    
-    // Ensure all text elements inside clone render at desktop scale
-    // By passing windowWidth: 1080 to html2canvas, media queries inside clone will evaluate as desktop.
-    
-    exportContainer.appendChild(clonedCard);
-    document.body.appendChild(exportContainer);
+    // Step 1: Inject a style override that forces DESKTOP CSS values on the clone,
+    //         cancelling every @media (max-width: ...) rule the browser would apply.
+    const styleTag = document.createElement('style');
+    styleTag.id = '__yec-export-style';
+    styleTag.textContent = `
+      #__yec-export-wrap * { transition: none !important; animation: none !important; }
+      #__yec-export-wrap .invitation-card {
+        width: 1080px !important; max-width: 1080px !important;
+        box-shadow: none !important; border: none !important; border-radius: 0 !important;
+        transform: none !important; opacity: 1 !important;
+      }
+      #__yec-export-wrap .card-header {
+        padding: 2.5rem 2rem 2rem !important; text-align: center !important;
+      }
+      #__yec-export-wrap .card-header-logo {
+        width: 180px !important; height: 180px !important;
+      }
+      #__yec-export-wrap .card-event-name { font-size: 2rem !important; }
+      #__yec-export-wrap .card-event-year {
+        font-size: 0.6rem !important; letter-spacing: 0.12em !important;
+      }
+      #__yec-export-wrap .tapestry-label { font-size: 1.1rem !important; }
+      #__yec-export-wrap .card-body { padding: 2.5rem 2.5rem !important; }
+      #__yec-export-wrap .greeting-line { font-size: 0.75rem !important; }
+      #__yec-export-wrap .invitee-name { font-size: 1.9rem !important; }
+      #__yec-export-wrap .recipient-info { margin-bottom: 1.8rem !important; }
+      #__yec-export-wrap .invitation-text {
+        font-size: 1.05rem !important; line-height: 2 !important;
+        margin-bottom: 1.2rem !important;
+      }
+      #__yec-export-wrap .event-details-box { padding: 1.2rem !important; }
+      #__yec-export-wrap .event-detail-label { font-size: 0.6rem !important; }
+      #__yec-export-wrap .event-detail-value { font-size: 0.95rem !important; }
+      #__yec-export-wrap .player-container,
+      #__yec-export-wrap #vintage-player { display: none !important; }
+      #__yec-export-wrap .logo-wrapper { margin: 0.6rem auto !important; }
+      #__yec-export-wrap .card-rule { margin: 0.8rem 0 !important; }
+      #__yec-export-wrap .body-divider { margin: 0.8rem 0 !important; }
+    `;
+    document.head.appendChild(styleTag);
 
-    // 3. Render the fixed 1080x1920 container
-    const canvas = await html2canvas(exportContainer, {
-      scale: 2, // High resolution for premium text quality
-      useCORS: true,
-      allowTaint: true,
-      backgroundColor: '#FDFAF4',
-      windowWidth: 1080,  // CRITICAL: Forces html2canvas to use desktop media queries
-      windowHeight: 1920,
-      logging: false,
+    // Step 2: Create the fixed off-screen wrapper
+    const wrapper = document.createElement('div');
+    wrapper.id = '__yec-export-wrap';
+    wrapper.style.cssText = [
+      'position:fixed', 'left:-9999px', 'top:0',
+      'width:1080px', 'background:#FDFAF4',
+      'overflow:visible', 'z-index:-1',
+    ].join(';');
+
+    // Step 3: Deep-clone the live card (name/gen already injected)
+    const cloned = invitationCard.cloneNode(true);
+    wrapper.appendChild(cloned);
+    document.body.appendChild(wrapper);
+
+    // Step 4: Wait one frame so browser resolves styles
+    await new Promise(r => requestAnimationFrame(r));
+
+    // Step 5: Capture wrapper — html2canvas renders exactly what the browser laid out
+    const cardCanvas = await html2canvas(wrapper, {
+      scale: 2, useCORS: true, allowTaint: true,
+      backgroundColor: '#FDFAF4', logging: false,
     });
 
-    // 4. Cleanup DOM
-    document.body.removeChild(exportContainer);
+    // Step 6: Clean up injected DOM
+    document.body.removeChild(wrapper);
+    document.head.removeChild(styleTag);
     actionButtons.style.visibility = '';
 
-    // 5. Trigger download directly from the 1080x1920 output
-    const dataURL = canvas.toDataURL('image/png', 1.0);
-    const a  = document.createElement('a');
-    const safeName = displayName.textContent.replace(/\s+/g, '_');
-    a.href     = dataURL;
-    a.download = `Thiep_Moi_YEC25_${safeName}.png`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
+    // Step 7: Composite captured card onto 1080x1920 Story canvas (centered vertically)
+    const OUT_W = 1080, OUT_H = 1920;
+    const storyCanvas = document.createElement('canvas');
+    storyCanvas.width = OUT_W; storyCanvas.height = OUT_H;
+    const sCtx = storyCanvas.getContext('2d');
+    sCtx.fillStyle = '#FDFAF4';
+    sCtx.fillRect(0, 0, OUT_W, OUT_H);
+    const scale  = OUT_W / cardCanvas.width;
+    const drawH  = cardCanvas.height * scale;
+    const drawY  = Math.max(0, (OUT_H - drawH) / 2);
+    sCtx.drawImage(cardCanvas, 0, drawY, OUT_W, drawH);
+
+    // Step 8: Trigger download
+    const a = document.createElement('a');
+    a.href = storyCanvas.toDataURL('image/png', 1.0);
+    a.download = `Thiep_Moi_YEC25_${displayName.textContent.replace(/\s+/g, '_')}.png`;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
 
     showToast('🎉 Thiệp Story (9:16) đã được tải về!');
 
   } catch (err) {
-    console.error('html2canvas error:', err);
+    console.error('Export error:', err);
     actionButtons.style.visibility = '';
     showToast('Có lỗi xảy ra khi tải ảnh. Thử lại nhé!');
   } finally {
+    // Safety cleanup in case of error
+    const leftover = document.getElementById('__yec-export-wrap');
+    if (leftover) document.body.removeChild(leftover);
+    const leftoverStyle = document.getElementById('__yec-export-style');
+    if (leftoverStyle) document.head.removeChild(leftoverStyle);
+
     downloadBtn.innerHTML = originalHTML;
     downloadBtn.disabled  = false;
   }
 });
+
+
 
 // (Removed share feature)
 
