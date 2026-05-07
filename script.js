@@ -460,49 +460,8 @@ downloadBtn.addEventListener('click', async () => {
   try {
     actionButtons.style.visibility = 'hidden';
 
-    const isMobile = window.innerWidth <= 768;
 
-    if (!isMobile) {
-      // ==========================================
-      // DESKTOP EXPORT — untouched
-      // ==========================================
-      const prevShadow = invitationCard.style.boxShadow;
-      const prevRadius = invitationCard.style.borderRadius;
-      const prevBorder = invitationCard.style.border;
-      invitationCard.style.boxShadow = 'none';
-      invitationCard.style.borderRadius = '0';
-      invitationCard.style.border = 'none';
 
-      const cardCanvas = await html2canvas(invitationCard, {
-        scale: 2, useCORS: true, allowTaint: true,
-        backgroundColor: '#FDFAF4', logging: false, removeContainer: true,
-      });
-
-      invitationCard.style.boxShadow = prevShadow;
-      invitationCard.style.borderRadius = prevRadius;
-      invitationCard.style.border = prevBorder;
-      actionButtons.style.visibility = '';
-
-      const OUT_W = 1080, OUT_H = 1920;
-      const storyCanvas = document.createElement('canvas');
-      storyCanvas.width = OUT_W; storyCanvas.height = OUT_H;
-      const sCtx = storyCanvas.getContext('2d');
-      sCtx.fillStyle = '#FDFAF4';
-      sCtx.fillRect(0, 0, OUT_W, OUT_H);
-      const scale = OUT_W / cardCanvas.width;
-      sCtx.drawImage(cardCanvas, 0, (OUT_H - cardCanvas.height * scale) / 2, OUT_W, cardCanvas.height * scale);
-
-      const a = document.createElement('a');
-      a.href = storyCanvas.toDataURL('image/png', 1.0);
-      a.download = `Thiep_Moi_YEC25_${displayName.textContent.replace(/\s+/g, '_')}.png`;
-      document.body.appendChild(a); a.click(); document.body.removeChild(a);
-      showToast('🎉 Thiệp Story (9:16) đã được tải về!');
-      return;
-    }
-
-    // ==========================================
-    // MOBILE EXPORT — dedicated 1080x1920 engine
-    // ==========================================
 
     // Step 1: Inject a style override that forces DESKTOP CSS values on the clone,
     //         cancelling every @media (max-width: ...) rule the browser would apply.
@@ -519,8 +478,9 @@ downloadBtn.addEventListener('click', async () => {
         padding: 2rem 1.5rem 1.5rem !important; text-align: center !important;
       }
       #__yec-export-wrap .card-header-logo {
-        width: 180px !important; height: auto !important; object-fit: contain !important;
-        flex-shrink: 0 !important; margin: 0 auto !important;
+        width: 180px !important; height: auto !important;
+        object-fit: contain !important; object-position: center !important;
+        flex-shrink: 0 !important; display: block !important; margin: 0 auto !important;
       }
       #__yec-export-wrap .card-event-name { font-size: 2rem !important; margin-bottom: 0.2rem !important; }
       #__yec-export-wrap .card-event-year {
@@ -543,8 +503,9 @@ downloadBtn.addEventListener('click', async () => {
       #__yec-export-wrap .player-container,
       #__yec-export-wrap #vintage-player { display: none !important; }
       #__yec-export-wrap .logo-wrapper { margin: 0.4rem auto !important; }
-      #__yec-export-wrap .card-rule { margin: 0.6rem 0 !important; }
+      #__yec-export-wrap .card-rule { width: 120px !important; margin: 0.6rem auto !important; }
       #__yec-export-wrap .body-divider { margin: 0.6rem 0 !important; }
+
     `;
     document.head.appendChild(styleTag);
 
