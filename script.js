@@ -471,6 +471,7 @@ downloadBtn.addEventListener('click', async () => {
       #__yec-export-wrap * { transition: none !important; animation: none !important; }
       #__yec-export-wrap .invitation-card {
         width: 1080px !important; max-width: 1080px !important;
+        font-family: 'EB Garamond', 'Georgia', serif !important;
         box-shadow: none !important; border: none !important; border-radius: 0 !important;
         transform: none !important; opacity: 1 !important;
       }
@@ -482,30 +483,58 @@ downloadBtn.addEventListener('click', async () => {
         object-fit: contain !important; object-position: center !important;
         flex-shrink: 0 !important; display: block !important; margin: 0 auto !important;
       }
-      #__yec-export-wrap .card-event-name { font-size: 2rem !important; margin-bottom: 0.2rem !important; }
+      #__yec-export-wrap .card-event-name {
+        font-family: 'Cormorant Garamond', 'Georgia', serif !important;
+        font-size: 2rem !important; margin-bottom: 0.2rem !important;
+      }
       #__yec-export-wrap .card-event-year {
+        font-family: 'Cormorant Garamond', 'Georgia', serif !important;
         font-size: 0.6rem !important; letter-spacing: 0.12em !important; margin-bottom: 0.5rem !important;
       }
-      #__yec-export-wrap .tapestry-label { font-size: 1.1rem !important; }
-      #__yec-export-wrap .card-body { padding: 1.8rem 2.5rem !important; }
-      #__yec-export-wrap .greeting-line { font-size: 0.75rem !important; margin-bottom: 0.3rem !important; }
-      #__yec-export-wrap .invitee-name { font-size: 1.9rem !important; margin-bottom: 0.3rem !important; }
+      #__yec-export-wrap .tapestry-label {
+        font-family: 'Cormorant Garamond', 'Georgia', serif !important;
+        font-size: 1.1rem !important;
+      }
+      #__yec-export-wrap .card-header-badge {
+        font-family: 'Cormorant Garamond', 'Georgia', serif !important;
+      }
+      #__yec-export-wrap .card-body {
+        padding: 1.8rem 2.5rem !important;
+        font-family: 'EB Garamond', 'Georgia', serif !important;
+      }
+      #__yec-export-wrap .greeting-line {
+        font-family: 'EB Garamond', 'Georgia', serif !important;
+        font-size: 0.75rem !important; margin-bottom: 0.3rem !important;
+      }
+      #__yec-export-wrap .invitee-name {
+        font-family: 'Playfair Display', 'Georgia', serif !important;
+        font-size: 1.9rem !important; margin-bottom: 0.3rem !important;
+      }
       #__yec-export-wrap .recipient-info { margin-bottom: 1.5rem !important; }
       #__yec-export-wrap .invitation-text {
+        font-family: 'EB Garamond', 'Georgia', serif !important;
         font-size: 1.05rem !important; line-height: 1.8 !important;
         margin-bottom: 1rem !important; text-align: justify !important;
       }
       #__yec-export-wrap .event-details-box { padding: 1rem !important; margin-bottom: 1.5rem !important; }
       #__yec-export-wrap .event-detail-item { margin-bottom: 0.8rem !important; }
-      #__yec-export-wrap .event-detail-label { font-size: 0.6rem !important; margin-bottom: 0.2rem !important; }
-      #__yec-export-wrap .event-detail-value { font-size: 0.95rem !important; }
-      #__yec-export-wrap .closing-quote { margin-top: 1.5rem !important; font-size: 1rem !important; }
+      #__yec-export-wrap .event-detail-label {
+        font-family: 'Cormorant Garamond', 'Georgia', serif !important;
+        font-size: 0.6rem !important; margin-bottom: 0.2rem !important;
+      }
+      #__yec-export-wrap .event-detail-value {
+        font-family: 'EB Garamond', 'Georgia', serif !important;
+        font-size: 0.95rem !important;
+      }
+      #__yec-export-wrap .closing-quote {
+        font-family: 'EB Garamond', 'Georgia', serif !important;
+        margin-top: 1.5rem !important; font-size: 1rem !important;
+      }
       #__yec-export-wrap .player-container,
       #__yec-export-wrap #vintage-player { display: none !important; }
       #__yec-export-wrap .logo-wrapper { margin: 0.4rem auto !important; }
       #__yec-export-wrap .card-rule { width: 120px !important; margin: 0.6rem auto !important; }
       #__yec-export-wrap .body-divider { margin: 0.6rem 0 !important; }
-
     `;
     document.head.appendChild(styleTag);
 
@@ -523,13 +552,16 @@ downloadBtn.addEventListener('click', async () => {
     wrapper.appendChild(cloned);
     document.body.appendChild(wrapper);
 
-    // Step 4: Wait one frame so browser resolves styles
+    // Step 4: Wait for fonts to fully load AND one extra frame for layout
+    await document.fonts.ready;
+    await new Promise(r => requestAnimationFrame(r));
     await new Promise(r => requestAnimationFrame(r));
 
     // Step 5: Capture wrapper — html2canvas renders exactly what the browser laid out
     const cardCanvas = await html2canvas(wrapper, {
       scale: 2, useCORS: true, allowTaint: true,
       backgroundColor: '#FDFAF4', logging: false,
+      windowWidth: 1080,
     });
 
     // Step 6: Clean up injected DOM
