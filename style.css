@@ -653,14 +653,14 @@ body {
   justify-content: center;
   background: rgba(249, 243, 228, 0.95);
   border: 1.5px solid rgba(201, 168, 108, 0.6);
-  border-radius: 50%;
+  border-radius: 50% !important;
   align-self: center;
+  color: #A0784A;
 }
 .event-detail-icon svg {
   width: 1.2rem;
   height: 1.2rem;
   fill: #A0784A;
-  stroke: none;
   flex-shrink: 0;
 }
 
