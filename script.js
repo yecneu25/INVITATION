@@ -462,54 +462,119 @@ downloadBtn.addEventListener('click', async () => {
     // Temporarily hide action buttons from screenshot
     actionButtons.style.visibility = 'hidden';
 
-    // 1. Strip shadow/radius so html2canvas captures ZERO transparent fringe
-    const prevShadow = invitationCard.style.boxShadow;
-    const prevRadius = invitationCard.style.borderRadius;
-    const prevBorder = invitationCard.style.border;
-    invitationCard.style.boxShadow = 'none';
-    invitationCard.style.borderRadius = '0';
-    invitationCard.style.border = 'none';
+    const isMobile = window.innerWidth <= 768;
 
-    // 2. Capture at 2× resolution with solid background
-    const cardCanvas = await html2canvas(invitationCard, {
-      scale: 2,
+    if (!isMobile) {
+      // ==========================================
+      // DESKTOP EXPORT LOGIC (KEPT EXACTLY AS-IS)
+      // ==========================================
+      const prevShadow = invitationCard.style.boxShadow;
+      const prevRadius = invitationCard.style.borderRadius;
+      const prevBorder = invitationCard.style.border;
+      invitationCard.style.boxShadow = 'none';
+      invitationCard.style.borderRadius = '0';
+      invitationCard.style.border = 'none';
+
+      const cardCanvas = await html2canvas(invitationCard, {
+        scale: 2,
+        useCORS: true,
+        allowTaint: true,
+        backgroundColor: '#FDFAF4',
+        logging: false,
+        removeContainer: true,
+      });
+
+      invitationCard.style.boxShadow = prevShadow;
+      invitationCard.style.borderRadius = prevRadius;
+      invitationCard.style.border = prevBorder;
+      actionButtons.style.visibility = '';
+
+      const OUT_W = 1080;
+      const OUT_H = 1920;
+      const storyCanvas = document.createElement('canvas');
+      storyCanvas.width  = OUT_W;
+      storyCanvas.height = OUT_H;
+      const sCtx = storyCanvas.getContext('2d');
+
+      sCtx.fillStyle = '#FDFAF4';
+      sCtx.fillRect(0, 0, OUT_W, OUT_H);
+
+      const scale = OUT_W / cardCanvas.width;
+      const drawW = OUT_W;
+      const drawH = cardCanvas.height * scale;
+      const drawX = 0;
+      const drawY = (OUT_H - drawH) / 2;
+
+      sCtx.drawImage(cardCanvas, drawX, drawY, drawW, drawH);
+
+      const dataURL = storyCanvas.toDataURL('image/png', 1.0);
+
+      const a  = document.createElement('a');
+      const safeName = displayName.textContent.replace(/\s+/g, '_');
+      a.href     = dataURL;
+      a.download = `Thiep_Moi_YEC25_${safeName}.png`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+
+      showToast('🎉 Thiệp Story (9:16) đã được tải về!');
+      return;
+    }
+
+    // ==========================================
+    // NEW MOBILE EXPORT LOGIC (1080x1920 CONTAINER)
+    // ==========================================
+    
+    // 1. Create a dedicated fixed 1080x1920 container
+    const exportContainer = document.createElement('div');
+    exportContainer.style.position = 'fixed';
+    exportContainer.style.left = '-9999px';
+    exportContainer.style.top = '-9999px';
+    exportContainer.style.width = '1080px';
+    exportContainer.style.height = '1920px';
+    exportContainer.style.backgroundColor = '#FDFAF4';
+    exportContainer.style.overflow = 'hidden';
+    exportContainer.style.display = 'flex';
+    exportContainer.style.alignItems = 'center';
+    exportContainer.style.justifyContent = 'center';
+    exportContainer.style.zIndex = '-9999';
+
+    // 2. Clone the invitation card and optimize for print/story
+    const clonedCard = invitationCard.cloneNode(true);
+    
+    // Force desktop styling rules on the clone by enforcing fixed width
+    // Slightly scale down from 1080 to maintain safe margins (e.g. 960px width)
+    clonedCard.style.width = '960px'; 
+    clonedCard.style.maxWidth = '960px';
+    clonedCard.style.margin = '0 auto';
+    clonedCard.style.transform = 'none'; // Remove slide-up animation
+    clonedCard.style.boxShadow = 'none'; // Prevent fringe artifacts
+    clonedCard.style.border = 'none';
+    clonedCard.style.borderRadius = '0';
+    
+    // Ensure all text elements inside clone render at desktop scale
+    // By passing windowWidth: 1080 to html2canvas, media queries inside clone will evaluate as desktop.
+    
+    exportContainer.appendChild(clonedCard);
+    document.body.appendChild(exportContainer);
+
+    // 3. Render the fixed 1080x1920 container
+    const canvas = await html2canvas(exportContainer, {
+      scale: 2, // High resolution for premium text quality
       useCORS: true,
       allowTaint: true,
-      backgroundColor: '#FDFAF4',   // card's own background color
+      backgroundColor: '#FDFAF4',
+      windowWidth: 1080,  // CRITICAL: Forces html2canvas to use desktop media queries
+      windowHeight: 1920,
       logging: false,
-      removeContainer: true,
     });
 
-    // Restore card styles
-    invitationCard.style.boxShadow = prevShadow;
-    invitationCard.style.borderRadius = prevRadius;
-    invitationCard.style.border = prevBorder;
+    // 4. Cleanup DOM
+    document.body.removeChild(exportContainer);
     actionButtons.style.visibility = '';
 
-    // 3. Create a 9:16 output canvas (1080×1920 — Facebook/Instagram Story standard)
-    const OUT_W = 1080;
-    const OUT_H = 1920;
-    const storyCanvas = document.createElement('canvas');
-    storyCanvas.width  = OUT_W;
-    storyCanvas.height = OUT_H;
-    const sCtx = storyCanvas.getContext('2d');
-
-    // 4. Fill background (covers any leftover top/bottom strip)
-    sCtx.fillStyle = '#FDFAF4';
-    sCtx.fillRect(0, 0, OUT_W, OUT_H);
-
-    // 5. Scale card to fill full width edge-to-edge
-    const scale = OUT_W / cardCanvas.width;
-    const drawW = OUT_W;
-    const drawH = cardCanvas.height * scale;
-    const drawX = 0;
-    const drawY = (OUT_H - drawH) / 2;   // center vertically
-
-    sCtx.drawImage(cardCanvas, drawX, drawY, drawW, drawH);
-
-    // 6. Export
-    const dataURL = storyCanvas.toDataURL('image/png', 1.0);
-
+    // 5. Trigger download directly from the 1080x1920 output
+    const dataURL = canvas.toDataURL('image/png', 1.0);
     const a  = document.createElement('a');
     const safeName = displayName.textContent.replace(/\s+/g, '_');
     a.href     = dataURL;
@@ -519,6 +584,7 @@ downloadBtn.addEventListener('click', async () => {
     document.body.removeChild(a);
 
     showToast('🎉 Thiệp Story (9:16) đã được tải về!');
+
   } catch (err) {
     console.error('html2canvas error:', err);
     actionButtons.style.visibility = '';
