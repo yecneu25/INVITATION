@@ -112,14 +112,12 @@ if (bgCanvas) {
 // ─── DOM REFERENCES ──────────────────────────────────
 const form            = document.getElementById('invitation-form');
 const nameInput       = document.getElementById('name-input');
-const genInput        = document.getElementById('gen-input');
 const welcomeScreen   = document.getElementById('welcome-screen');
 const fallingCanvas   = document.getElementById('falling-canvas');
 const invitationScreen= document.getElementById('invitation-screen');
 const invitationCard  = document.getElementById('invitation-card');
 const actionButtons   = document.getElementById('action-buttons');
 const displayName     = document.getElementById('display-name');
-const displayGen      = document.getElementById('display-gen');
 const downloadBtn     = document.getElementById('download-btn');
 const toast           = document.getElementById('toast');
 const displaySalutation = document.getElementById('display-salutation');
@@ -130,7 +128,6 @@ const closingSalUpper   = document.getElementById('closing-salutation-upper');
 // ─── URL PARAMETERS & PRE-FILL ───────────────────────
 const urlParams = new URLSearchParams(window.location.search);
 let paramName = urlParams.get('name');
-let paramGen = urlParams.get('gen');
 let paramSalutation = urlParams.get('salutation');
 const paramToken = urlParams.get('token');
 
@@ -157,8 +154,7 @@ if (paramToken) {
     const parts = decoded.split('|');
     if (parts.length >= 2) {
       paramName = parts[0];
-      paramGen = parts[1];
-      paramSalutation = parts[2] || 'Anh';
+      paramSalutation = parts[1] || 'Anh';
     }
   }
 }
@@ -195,16 +191,13 @@ form.addEventListener('submit', (e) => {
   e.preventDefault();
 
   let name = '';
-  let gen = '';
   let salutation = '';
 
-  if (paramName && paramGen) {
+  if (paramName) {
     name = paramName;
-    gen = paramGen;
     salutation = paramSalutation || 'Anh';
   } else {
     name = nameInput.value.trim();
-    gen  = genInput.value.trim();
     salutation = document.querySelector('input[name="salutation"]:checked')?.value || 'Anh';
 
     if (!name) {
@@ -212,16 +205,10 @@ form.addEventListener('submit', (e) => {
       showToast('Bạn chưa nhập Họ và Tên nhé! 😊');
       return;
     }
-    if (!gen) {
-      shakeInput(genInput);
-      showToast('Bạn chưa nhập Thế Hệ nhé! 🍊');
-      return;
-    }
   }
 
   // Populate invitation card
   displayName.textContent = name;
-  displayGen.textContent  = gen;
   displaySalutation.textContent = salutation;
   // inline salutations inside body text — lowercase
   inlineSalutations.forEach(el => el.textContent = salutation.toLowerCase());
