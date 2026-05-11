@@ -989,6 +989,7 @@ body {
 /* --- LAPTOP / DESKTOP (min 768px) — unchanged --- */
 @media (min-width: 768px) {
   .welcome-card { padding: 3.5rem 4rem; }
+  .welcome-pretitle { font-size: 0.58rem; letter-spacing: 0.16em; }
   .welcome-title { font-size: 1.8rem; }
   .card-body { padding: 2.5rem 2.5rem; }
   .invitation-text { font-size: 1.05rem; }
