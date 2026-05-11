@@ -152,9 +152,17 @@ if (paramToken) {
   const decoded = decodeBase64UTF8(paramToken);
   if (decoded) {
     const parts = decoded.split('|');
-    if (parts.length >= 2) {
+    if (parts.length >= 3) {
+      // Old format: Name | Gen | Salutation
+      paramName = parts[0];
+      paramSalutation = parts[2] || 'Anh';
+    } else if (parts.length === 2) {
+      // New format: Name | Salutation
       paramName = parts[0];
       paramSalutation = parts[1] || 'Anh';
+    } else if (parts.length === 1) {
+      paramName = parts[0];
+      paramSalutation = 'Anh';
     }
   }
 }
