@@ -229,6 +229,10 @@ form.addEventListener('submit', (e) => {
   if (closingSalLower) closingSalLower.textContent = salutation.toLowerCase();
   if (closingSalUpper) closingSalUpper.textContent = salutation.toLowerCase();
 
+  // custom music tooltip salutation
+  const vinylTooltip = document.querySelector('.vinyl-tooltip');
+  if (vinylTooltip) vinylTooltip.textContent = `${salutation} chạm để mở nhạc nhé 🎵`;
+
   // Start the transition sequence
   startSequence();
 });
