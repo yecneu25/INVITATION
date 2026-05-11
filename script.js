@@ -249,6 +249,19 @@ function startSequence() {
   // Step 1: Fade out the welcome form
   welcomeScreen.classList.add('fade-out');
 
+  // Step 1.5: Phát nhạc ngay khi người dùng bấm nút (click = trusted event, không bị chặn)
+  if (bgMusic && !isMusicPlaying) {
+    bgMusic.volume = 0.5;
+    if (bgMusic.currentTime < 10) bgMusic.currentTime = 10;
+    bgMusic.play().then(() => {
+      isMusicPlaying = true;
+      hasInteractedWithMusic = true;
+      if (vinylWrapper) vinylWrapper.classList.add('playing');
+    }).catch(() => {
+      // Nếu vẫn bị chặn (rất hiếm), fallback listener sẽ tiếp quản
+    });
+  }
+
   // Step 2: After fade-out (600ms), start orange rain
   setTimeout(() => {
     welcomeScreen.style.display = 'none';
