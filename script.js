@@ -167,7 +167,7 @@ if (paramToken) {
   }
 }
 
-if (paramName && paramGen) {
+if (paramName) {
   // Hide the form inputs
   const formInputs = document.getElementById('form-inputs');
   if (formInputs) formInputs.style.display = 'none';
