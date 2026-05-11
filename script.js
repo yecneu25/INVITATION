@@ -261,7 +261,6 @@ function startSequence() {
       isMusicPlaying = true;
       hasInteractedWithMusic = true;
       if (vinylWrapper) vinylWrapper.classList.add('playing');
-      if (soundBars) soundBars.classList.add('active');
     }).catch(() => {
       // Nếu vẫn bị chặn (rất hiếm), fallback listener sẽ tiếp quản
     });
@@ -645,7 +644,6 @@ const vinylWrapper = document.getElementById('vinyl-wrapper');
 const timeDisplay = document.getElementById('time-display');
 const progressWrapper = document.getElementById('progress-wrapper');
 const progressBar = document.getElementById('progress-bar');
-const soundBars = document.querySelector('.sound-bars');
 let isMusicPlaying = false;
 let hasInteractedWithMusic = false;
 
@@ -681,7 +679,6 @@ function toggleMusic() {
     bgMusic.pause();
     isMusicPlaying = false;
     if (vinylWrapper) vinylWrapper.classList.remove('playing');
-    if (soundBars) soundBars.classList.remove('active');
   } else {
     if (bgMusic.currentTime < 10) {
       bgMusic.currentTime = 10;
@@ -689,7 +686,6 @@ function toggleMusic() {
     bgMusic.play().then(() => {
       isMusicPlaying = true;
       if (vinylWrapper) vinylWrapper.classList.add('playing');
-      if (soundBars) soundBars.classList.add('active');
     }).catch(err => {
       console.log('Audio play failed:', err);
     });
@@ -736,7 +732,6 @@ function attemptAutoplay() {
   bgMusic.play().then(() => {
     isMusicPlaying = true;
     if (vinylWrapper) vinylWrapper.classList.add('playing');
-    if (soundBars) soundBars.classList.add('active');
     hasInteractedWithMusic = true;
   }).catch(() => {
     // Autoplay blocked by browser. Wait for user moving mouse/scrolling/clicking
