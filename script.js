@@ -1,6 +1,6 @@
 /* ====================================================
    script.js — YEC 25th Anniversary Invitation
-   Tapestry of Remembrance
+   Y-Gala: Chronicles
    ==================================================== */
 
 // ─── CONTINUOUS BACKGROUND PARTICLES ─────────────────
